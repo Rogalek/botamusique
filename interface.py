@@ -10,14 +10,14 @@ import os.path
 import errno
 from typing import Type
 import media
-from media.item import dicts_to_items, dict_to_item, BaseItem
+from media.item import dicts_to_items, BaseItem
 from media.file import FileItem
 from media.url import URLItem
 from media.url_from_playlist import PlaylistURLItem
 from media.radio import RadioItem
 from media.cache import get_cached_wrapper_from_scrap, get_cached_wrapper_by_id, get_cached_wrappers_by_tags, \
     get_cached_wrapper
-from database import MusicDatabase, Condition
+from database import Condition
 import logging
 import time
 
@@ -128,6 +128,7 @@ def build_tags_color_lookup():
         color_lookup[tag] = tag_color(tag)
 
     return color_lookup
+
 
 def get_all_dirs():
     dirs = []
@@ -404,6 +405,7 @@ def post():
 
     return status()
 
+
 def build_library_query_condition(form):
     try:
         condition = Condition()
@@ -439,6 +441,7 @@ def build_library_query_condition(form):
         return condition
     except KeyError:
         abort(400)
+
 
 @web.route("/library", methods=['POST'])
 @requires_auth

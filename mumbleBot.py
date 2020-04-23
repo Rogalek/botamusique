@@ -311,7 +311,6 @@ class MumbleBot:
         # text if the object message, contain information if direct message or channel message
         self.mumble.users[text.actor].send_text_message(msg)
 
-
     def send_channel_msg(self, msg):
         msg = msg.encode('utf-8', 'ignore').decode('utf-8')
         own_channel = self.mumble.channels[self.mumble.users.myself['channel_id']]

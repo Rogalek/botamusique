@@ -1,6 +1,6 @@
 # coding=utf-8
 import logging
-import math
+import random
 
 import pymumble.pymumble_py3 as pymumble
 import re
@@ -13,7 +13,7 @@ from librb import radiobrowser
 from database import SettingsDatabase, MusicDatabase, Condition
 from media.item import item_id_generators, dict_to_item, dicts_to_items
 from media.cache import get_cached_wrapper_from_scrap, get_cached_wrapper_by_id, get_cached_wrappers_by_tags, \
-    get_cached_wrapper, get_cached_wrappers, get_cached_wrapper_from_dict, get_cached_wrappers_from_dicts
+    get_cached_wrapper, get_cached_wrapper_from_dict, get_cached_wrappers_from_dicts
 from media.url_from_playlist import get_playlist_info
 
 log = logging.getLogger("bot")
@@ -65,6 +65,9 @@ def register_all_commands(bot):
     bot.register_command(constants.commands('delete_from_library'), cmd_delete_from_library)
     bot.register_command(constants.commands('drop_database'), cmd_drop_database, no_partial_match=True)
     bot.register_command(constants.commands('rescan'), cmd_refresh_cache, no_partial_match=True)
+
+    bot.register_command(constants.commands('roll'), cmd_roll)
+    bot.register_command(constants.commands('sorted_roll'), cmd_sorted_roll)
 
     # Just for debug use
     bot.register_command('rtrms', cmd_real_time_rms, True)
@@ -1181,3 +1184,40 @@ def cmd_loop_state(bot, user, text, command, parameter):
 
 def cmd_item(bot, user, text, command, parameter):
     var.playlist._debug_print()
+
+
+def prepare_die(bot, parameter, sort=False):
+    global log
+    try:
+        result = []
+        add_value = 0
+        dices = parameter
+        if '+' in parameter or '-' in parameter:
+            plus = True if '+' in parameter else False
+            dices = parameter.split('+')[0] if plus else parameter.split('-')[0]
+            add_value = int(parameter.split('+')[1]) if plus else int(parameter.split('-')[1])
+
+        rolls = int(dices.split('d')[0])
+        dice_value = int(dices.split('d')[1])
+        for r in range(rolls):
+            result.append(*random.choices([x+1 for x in range(dice_value)]))
+        suma = sum(result)
+        if add_value:
+            suma = suma + add_value if plus else suma - add_value
+        if sort:
+            result.sort()
+        bot.send_channel_msg(constants.strings('roll', roll=result))
+        bot.send_channel_msg(constants.strings('suma', suma=suma))
+    except:
+        bot.send_channel_msg(constants.strings('bad_roll'))
+        return
+
+
+def cmd_roll(bot, user, text, command, parameter):
+    global log
+    prepare_die(bot, parameter)
+
+
+def cmd_sorted_roll(bot, user, text, command, parameter):
+    global log
+    prepare_die(bot, parameter, sort=True)
