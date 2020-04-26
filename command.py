@@ -1186,7 +1186,7 @@ def cmd_item(bot, user, text, command, parameter):
     var.playlist._debug_print()
 
 
-def prepare_die(bot, parameter, sort=False):
+def prepare_die(bot, user, parameter, sort=False):
     global log
     try:
         result = []
@@ -1201,13 +1201,13 @@ def prepare_die(bot, parameter, sort=False):
         dice_value = int(dices.split('d')[1])
         for r in range(rolls):
             result.append(*random.choices([x+1 for x in range(dice_value)]))
-        suma = sum(result)
+        total = sum(result)
         if add_value:
-            suma = suma + add_value if plus else suma - add_value
+            total = total + add_value if plus else total - add_value
         if sort:
             result.sort()
-        bot.send_channel_msg(constants.strings('roll', roll=result))
-        bot.send_channel_msg(constants.strings('suma', suma=suma))
+        bot.send_channel_msg(constants.strings('roll', user=user, param=parameter, roll=result))
+        bot.send_channel_msg(constants.strings('total', total=total))
     except:
         bot.send_channel_msg(constants.strings('bad_roll'))
         return
@@ -1215,9 +1215,9 @@ def prepare_die(bot, parameter, sort=False):
 
 def cmd_roll(bot, user, text, command, parameter):
     global log
-    prepare_die(bot, parameter)
+    prepare_die(bot, bot.mumble.users[text.actor]['name'], parameter)
 
 
 def cmd_sorted_roll(bot, user, text, command, parameter):
     global log
-    prepare_die(bot, parameter, sort=True)
+    prepare_die(bot, bot.mumble.users[text.actor]['name'], parameter, sort=True)
